@@ -12,7 +12,6 @@ def isDigit(c):
     except ValueError:
         return False
 
-
 class scanner():
 
     buffer = ''
@@ -24,7 +23,8 @@ class scanner():
         if (c == ' ' or c == '\n') and (self.state != 1):
             if (
                 self.state == 6.1 or self.state == 7.3 or self.state == 8.4 or
-                self.state == 9.4
+                self.state == 9.4 or self.state == 10.3 or self.state == 11.2 or
+                self.state == 12.5 or self.state == 13.3
             ):
                 self.tokens.append((self.buffer, 'reserved'))
                 self.buffer = ''
@@ -57,7 +57,13 @@ class scanner():
                 self.buffer += c
             elif c == 'u':
                 self.state = 9.0
-                self.buffer += c    
+                self.buffer += c
+            elif c == 'e':
+                self.state = 10.0
+                self.buffer += c
+            elif c == 'r':
+                self.state = 12.0
+                self.buffer += c
             elif isLetter(c):
                 self.state = 3
                 self.buffer += c
@@ -71,7 +77,7 @@ class scanner():
                 self.state = 0
             else:
                 raise Exception('no match')
-        #identifire
+        #Identifire
         elif self.state == 3:
             if isLetter(c):
                 self.buffer += c
@@ -80,7 +86,7 @@ class scanner():
                 self.buffer = ''
                 self.state = 0
                 self.read(c)
-        #number
+        #Number
         elif self.state == 4:
             if isDigit(c):
                 self.buffer += c
@@ -89,11 +95,11 @@ class scanner():
                 self.buffer = ''
                 self.state = 0
                 self.read(c)
-        #comment
+        #Comment
         elif self.state == 5:
             if c == '}':
                 self.state = 0
-        #if
+        #If
         elif math.floor(self.state) == 6:
             if c == 'f' and self.state == 6.0:
                 self.state = 6.1
@@ -116,7 +122,7 @@ class scanner():
                     self.buffer = ''
                     self.state = 0
                     self.read(c)
-        #then
+        #Then
         elif math.floor(self.state) == 7:
             if c == 'h' and self.state == 7.0:
                 self.state = 7.1
@@ -145,7 +151,8 @@ class scanner():
                     self.buffer = ''
                     self.state = 0
                     self.read(c)
-        #write
+
+        #Write
         elif math.floor(self.state) == 8:
             if c == 'r' and self.state == 8.0:
                 self.state = 8.1
@@ -177,7 +184,7 @@ class scanner():
                     self.buffer = ''
                     self.state = 0
                     self.read(c)
-        #until
+        #Until
         elif math.floor(self.state) == 9:
             if c == 'n' and self.state == 9.0:
                 self.state = 9.1
@@ -209,6 +216,122 @@ class scanner():
                     self.buffer = ''
                     self.state = 0
                     self.read(c)
+        #Else
+        elif math.floor(self.state) == 10:
+            if c == 'l' and self.state == 10.0:
+                self.state = 10.1
+                self.buffer += c
+            elif c == 'n' and self.state == 10.0:
+                self.state = 11.1
+                self.buffer += c
+            elif c == 's' and self.state == 10.1:
+                self.state = 10.2
+                self.buffer += c
+            elif c == 'e' and self.state == 10.2:
+                self.state = 10.3
+                self.buffer += c
+            elif self.state == 10.3:
+                if isLetter(c):
+                    self.state = 3
+                    self.buffer += c
+                else:
+                    self.tokens.append((self.buffer, 'reserved'))
+                    self.buffer = ''
+                    self.state = 0
+                    self.read(c)
+            else:
+                if isLetter(c):
+                    self.state = 3
+                    self.buffer += c
+                else:
+                    self.tokens.append((self.buffer, 'identifier'))
+                    self.buffer = ''
+                    self.state = 0
+                    self.read(c)
+        #End
+        elif math.floor(self.state) == 11:
+            if c == 'd' and self.state == 11.1:
+                self.state = 11.2
+                self.buffer += c
+            elif self.state == 11.2:
+                if isLetter(c):
+                    self.state = 3
+                    self.buffer += c
+                else:
+                    self.tokens.append((self.buffer, 'reserved'))
+                    self.buffer = ''
+                    self.state = 0
+                    self.read(c)
+            else:
+                if isLetter(c):
+                    self.state = 3
+                    self.buffer += c
+                else:
+                    self.tokens.append((self.buffer, 'identifier'))
+                    self.buffer = ''
+                    self.state = 0
+                    self.read(c)
+        #Repeat
+        elif math.floor(self.state) == 12:
+            if c == 'e' and self.state == 12.0:
+                self.state = 12.1
+                self.buffer += c
+            elif c == 'p' and self.state == 12.1:
+                self.state = 12.2
+                self.buffer += c
+            elif c == 'a' and self.state == 12.1:
+                self.state = 13.2
+                self.buffer += c
+            elif c == 'e' and self.state == 12.2:
+                self.state = 12.3
+                self.buffer += c
+            elif c == 'a' and self.state == 12.3:
+                self.state = 12.4
+                self.buffer += c
+            elif c == 't' and self.state == 12.4:
+                self.state = 12.5
+                self.buffer += c
+            elif self.state == 12.5:
+                if isLetter(c):
+                    self.state = 3
+                    self.buffer += c
+                else:
+                    self.tokens.append((self.buffer, 'reserved'))
+                    self.buffer = ''
+                    self.state = 0
+                    self.read(c)
+            else:
+                if isLetter(c):
+                    self.state = 3
+                    self.buffer += c
+                else:
+                    self.tokens.append((self.buffer, 'identifier'))
+                    self.buffer = ''
+                    self.state = 0
+                    self.read(c)
+        #Read
+        elif math.floor(self.state) == 13:
+            if c == 'd' and self.state == 13.2:
+                self.state = 13.3
+                self.buffer += c
+            elif self.state == 13.3:
+                if isLetter(c):
+                    self.state = 3
+                    self.buffer += c
+                else:
+                    self.tokens.append((self.buffer, 'reserved'))
+                    self.buffer = ''
+                    self.state = 0
+                    self.read(c)
+            else:
+                if isLetter(c):
+                    self.state = 3
+                    self.buffer += c
+                else:
+                    self.tokens.append((self.buffer, 'identifier'))
+                    self.buffer = ''
+                    self.state = 0
+                    self.read(c)
 
     def eval(self):
         if self.state == 3:
@@ -221,7 +344,8 @@ class scanner():
             self.state = 0
         elif (
             self.state == 6.1 or self.state == 7.3 or self.state == 8.4 or
-            self.state == 9.4
+            self.state == 9.4 or self.state == 10.3 or self.state == 11.2 or
+            self.state == 12.5 or self.state == 13.3
         ):
             self.tokens.append((self.buffer, 'reserved'))
             self.buffer = ''
@@ -231,7 +355,7 @@ class scanner():
 
 scannerObj = scanner()
 
-for c in "write;until12":
+for c in "end8then9else0end11rea{asjfan;}d22repeat12until22if":
     scannerObj.read(c)
 
 print(scannerObj.eval())
