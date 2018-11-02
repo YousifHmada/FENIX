@@ -1,4 +1,5 @@
 import math
+import sys
 
 
 def isLetter(c):
@@ -12,6 +13,7 @@ def isDigit(c):
     except ValueError:
         return False
 
+
 class scanner():
 
     buffer = ''
@@ -19,7 +21,6 @@ class scanner():
     tokens = []
 
     def read(self, c):
-
         if (c == ' ' or c == '\n') and (self.state != 1):
             if (
                 self.state == 6.1 or self.state == 7.3 or self.state == 8.4 or
@@ -29,9 +30,16 @@ class scanner():
                 self.tokens.append((self.buffer, 'reserved'))
                 self.buffer = ''
                 self.state = 0
-            self.state = 0
+            elif self.state == 3:
+                self.tokens.append((self.buffer, 'identifier'))
+                self.buffer = ''
+                self.state = 0
+            elif self.state == 4:
+                self.tokens.append((self.buffer, 'number'))
+                self.buffer = ''
+                self.state = 0
             return
-
+        #symbol
         if self.state == 0:
             if (
                 c == '+' or c == '-' or c == '*' or c == '/' or c == '=' or
@@ -69,7 +77,7 @@ class scanner():
                 self.buffer += c
             else:
                 raise Exception('no match')
-        #symbol
+        #:=
         elif self.state == 1:
             if c == '=':
                 self.tokens.append((self.buffer+c, 'sybmol'))
@@ -151,7 +159,6 @@ class scanner():
                     self.buffer = ''
                     self.state = 0
                     self.read(c)
-
         #Write
         elif math.floor(self.state) == 8:
             if c == 'r' and self.state == 8.0:
@@ -353,9 +360,22 @@ class scanner():
         return self.tokens
 
 
+def listToTxt(list):
+    output = ''
+    for token, type in list:
+        output += token + ' : ' + type + '\n'
+    return output
+
+
 scannerObj = scanner()
 
-for c in "end8then9else0end11rea{asjfan;}d22repeat12until22if":
-    scannerObj.read(c)
+with open(sys.argv[1], "r") as f:
+    for c in f.read():
+        scannerObj.read(c)
 
-print(scannerObj.eval())
+with open('output.txt', "w") as f:
+    f.write(
+        listToTxt(
+            scannerObj.eval()
+        )
+    )
